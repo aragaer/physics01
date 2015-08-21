@@ -55,13 +55,19 @@ function Star(){
 function Step(){
     var a, ax, ay, dx, dy, r;
     
+    var nvx = [], nvy = [];
+    for (var i = 0; i < star.length; i++) {
+    	nvx[i] = star[i].vx;
+    	nvy[i] = star[i].vy;
+    }
+    
     // важно провести вычисление каждый с каждым
     for(var i = 0; i < star.length; i++) // считаем текущей
         for(var j = 0; j < star.length; j++) // считаем второй
         {
             if(i == j) continue;
-            dx = star[j].x - star[i].x;
-            dy = star[j].y - star[i].y;
+            dx = star[j].x + star[j].vx*dt/2 - star[i].x - star[i].vx*dt/2;
+            dy = star[j].y + star[j].vy*dt/2 - star[i].y - star[i].vy*dt/2;
             
             r = dx * dx + dy * dy;// тут R^2
             if(r < 0.1) r = 0.1; // избегаем деления на очень маленькое число
@@ -71,13 +77,15 @@ function Step(){
             ax = a * dx / r; // a * cos
             ay = a * dy / r; // a * sin
             
-            star[i].vx += ax * dt;
-            star[i].vy += ay * dt;
+            nvx[i] += ax * dt;
+            nvy[i] += ay * dt;
         }
     // координаты меняем позже, потому что они влияют на вычисление ускорения
     for(var i = 0; i < star.length; i++){
-        star[i].x += star[i].vx * dt;
-        star[i].y += star[i].vy * dt;
+    	star[i].vx = nvx[i];
+    	star[i].vy = nvy[i];
+        star[i].x += nvx[i] * dt;
+        star[i].y += nvy[i] * dt;
     }
     
     // выводим на экран
